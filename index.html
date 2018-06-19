@@ -41,10 +41,15 @@
         </div>
 
         <div data-role="main" class="ui-content">
+            <div></div>
             <progress value="0" max="100" id="uploader"> 0% </progress>
             <input type="file" id="fileButton" />
         </div>
-
+        <p id = "mednamepg1"></p>
+        <p id="medprobpg1"></p>
+        </div>
+    
+        
 
 
     </div>
@@ -151,14 +156,13 @@
                             //  console.log(medname.probability);
                             var medprob = medname.probability;
                             console.log(medprob);
-
-
+                           
 
                             if (medID == "Enalapril maleate") {
-                                //testing redirection 
+                                //testing redirection
                                 window.location.href = "#pagetwo";
                                 //.replace / .href try both.
-
+                                document.getElementById("Enalaprilprob").innerHTML="Probability of Enalapril Maleate is "+ medprob*100+"%";
 
                                 (function (medID) {
 
@@ -193,9 +197,9 @@
 
 
                             }*/ else if (medID == "lisinopril") {
-
-
                                 window.location.href = "#pagethree";
+                                document.getElementById("lisinoprilprob").innerHTML="Probability of Enalapril Maleate is "+ medprob*100+"%";
+
                                 //getting information from database api
                                 $.getJSON("https://api.fda.gov/drug/label.json?search=" + medID,
                                     function (obj) {
@@ -206,6 +210,8 @@
                             }
                             else if (medID == "Losartan") {
                                 window.location.href = "#pagefour";
+                                document.getElementById("Losartanprob").innerHTML="Probability of Enalapril Maleate is "+ medprob*100+"%";
+
                                 (function (medID) {
                                     $.getJSON("https://api.fda.gov/drug/label.json?search=%22Enalapril%20maleate%22&limit=5",
                                         function (obj) {
@@ -218,6 +224,9 @@
                                 }());
 
 
+                            }
+                            else{
+                            document.getElementById("mednamepg1").innerHTML = "The Medicine is "+medID + " with a probability of " +medprob*100 +"%" ;
                             }
 
 
@@ -274,7 +283,6 @@ $.ajax({
     <div data-role="page" id="pagetwo">
 
         <div data-role="header" data-position="fixed">
-
             <p id="menubar2">
                 <span style="cursor:pointer" onclick="openNav()">&#9776; Menu</span>
             </p>
@@ -283,7 +291,6 @@ $.ajax({
                 <p>
                     <div id="leftsidenav" class="sidenav">
                         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-
                         <a href="index.html">Find another Drug</a>
                         <!-- javascript indications_and_usage-->
                         <a href="#pagethree">lisinopril</a>
@@ -313,6 +320,8 @@ $.ajax({
 
 
         <div data-role="content">
+                <div class="alert alert-danger" role="alert" id="Enalaprilprob">
+                      </div>
             <!-- /content -->
             <div id="content">
                 <h2 id="page2overview"> OverView of Enalapril</h2>
@@ -635,6 +644,8 @@ $.ajax({
             }
         </style>
         <div data-role="content">
+                <div class="alert alert-danger" role="alert" id="lisinoprilprob">
+                    </div>
             <div id="content">
                 <h3 id="page3overview"> OverView of Lisinopril</h3>
                 <p class="forpadding">Lisinopril is used alone or together with other medicines to treat high blood pressure (hypertension). High
@@ -899,6 +910,8 @@ $.ajax({
         </style>
 
         <div data-role="content">
+                <div class="alert alert-danger" role="alert" id="Losartanprob">
+                    </div>
             <div id="content">
                 <h2> OverView of Losartan</h2>
                 <p>In addition to the use of the medicine your doctor has prescribed, treatment for your high blood pressure
