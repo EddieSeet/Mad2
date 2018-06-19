@@ -1,0 +1,138 @@
+<html>
+    <head>
+        
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen"></style>
+    
+    
+<script src="https://www.gstatic.com/firebasejs/3.5.2/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/3.5.2/firebase-storage.js"></script>
+</head>
+
+
+
+<script>
+//openfda api key = C8SvDPE51Yam9fvlrigjbsQNUckVYX8wnYlVkPMG
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // Initialize Firebase
+  /*var config = {
+            apiKey: "AIzaSyAxFQzndiM1bZaQXTD_A-i3fH8YH68uAj4",
+            authDomain: "medproject-9b4df.firebaseapp.com",
+            databaseURL: "https://medproject-9b4df.firebaseio.com",
+            //projectId: "medproject-9b4df",
+            storageBucket: "medproject-9b4df.appspot.com"
+            //messagingSenderId: "270721368507"
+        };
+        firebase.initializeApp(config);
+       
+(function () {
+
+        //manage Firebase storage
+        var storageRef = firebase.storage().ref("storage-demo");
+        var uploadsRef = firebase.database().ref("storage-demo/uploads");
+        var uploadsMetadata = {
+            cacheControl: "max-age=" + (60 * 60 * 24 * 365)//one year of sevond
+        };
+
+        var uploadFile = function (file) {
+            //upload the file
+            var uploadTask = storageRef.child(file.name).put(file, uploadsMetadata);
+
+            return new Promise(function (resolve, reject) {
+                uploadTask.on("state_changed", function (snap) {
+                    console.log("Progress: ", snap.bytesTransferred, "/",
+                        snap.totalyBytes, "bytes");
+
+                }, function (error) {
+                    console.log("upload error", err);
+                    reject(err);
+                }, function () {
+                    var metadata = uploadTask.snapshot.netadata;
+                    var key = metadata.md5Hash.replace(/\//g, ":");
+                    var fileRecord = {
+                        downloadURL: uploadTask.snapshot.downloadURL,
+                        key: key,
+                        metadata: {
+                            fullPath: metadata.fullPath,
+                            md5Hash: metadata.md5Hash,
+                            name: metadata.name
+                        }
+                    };
+                    uploadRef.child(key).set(fileRecord).then(resolve, reject);
+                });
+            });
+
+        };
+
+        var removeFile = function (file) {
+            //remove file. Use file.key to find the file under /storage-demo/uploads/{file.key}
+            return storageRef.child(file.metadata.name).delete()
+                .then(function () {
+                    return uploadsRef.child(file.key).remove();
+                })
+                .then(function () {
+                    var toast = document.querySelector("#toast");
+                    toast.text = "File removed:" + file.metadata.name;
+                    toast.show();
+                })
+                .catch(function (err) {
+                    console.log("remove error", err);
+                });
+        };
+
+        //handle page events
+        var app = document.querySelector("#app");
+        app.upload = function () {
+            var files = document.querySelector("#files-input").files;
+            var i = files.length;
+            var promises = [];
+
+            while (i--) {
+                promises.push(uploadFile(files[i]));
+            }
+
+            return Promise.all(promises)
+                .then(function () {
+                    var toast = document.querySelector("#toast");
+                    toast.text = "File.uploaded";
+                    toast.show();
+                });
+        };
+
+        app.remove = function (e) {
+            removeFile(e.target.file);
+        };
+    });*/
+
+
+
+
+</script>
+
+</html>

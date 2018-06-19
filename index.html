@@ -1,0 +1,1116 @@
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <style media="screen"></style>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="jquery.mobile-1.4.5.min.css">
+    <script src="jquery-1.11.3.min.js"></script>
+    <script src="jquery.mobile-1.4.5.js"></script>
+    <script src="respond.min.js"> </script>
+    <modernizr class="custom 62074 js"></modernizr>
+    <script src="jquery-3.3.1.min.js"></script>
+
+
+    <!--bootstrap-->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="bootstrap.min.js"></script>
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+
+
+
+</head>
+
+<!-- fire base-->
+<script src="https://www.gstatic.com/firebasejs/3.5.2/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/3.5.2/firebase-storage.js"></script>
+<!--
+<script src="https://www.gstatic.com/firebasejs/3.5.2/firebase-database.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/5.0.4/firebase.js"></script>>-->
+
+<body>
+
+    <div data-role="page" id="pageone">
+        <div data-role="header">
+            <h1>My Header</h1>
+        </div>
+
+        <div data-role="main" class="ui-content">
+            <progress value="0" max="100" id="uploader"> 0% </progress>
+            <input type="file" id="fileButton" />
+        </div>
+
+
+
+    </div>
+
+
+    <script>
+
+        // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyAxFQzndiM1bZaQXTD_A-i3fH8YH68uAj4",
+            authDomain: "medproject-9b4df.firebaseapp.com",
+            databaseURL: "https://medproject-9b4df.firebaseio.com",
+            //projectId: "medproject-9b4df",
+            storageBucket: "medproject-9b4df.appspot.com"
+            //messagingSenderId: "270721368507"
+        };
+        firebase.initializeApp(config);
+
+    </script>
+    <style media="screen">
+        body {
+            display: flex;
+            width: 100%;
+            margin: 0%;
+            padding: 0%;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        #uploader {
+            -webkit-appearance: none;
+            width: 50%;
+            margin-bottom: 10px
+        }
+    </style>
+
+
+
+
+
+
+
+    <script>
+
+
+
+        // get elements
+        var uploader = document.getElementById("uploader");
+        var fileButton = document.getElementById("fileButton");
+
+        var uploadsMetadata = { cacheControl: "max-age=" + (60 * 60 * 24 * 365) };
+
+        /*listen for file selection*/
+        fileButton.addEventListener("change", function (e) {
+
+            //get file
+            var file = e.target.files[0]; //create storage ref //manage Firebase Storage 
+            var storageRef = firebase.storage().ref("medicine/" + file.name);/*firebase.storage.ref("folder_name/file_name")*/ //upload file tofirebase
+            var task = storageRef.child(file.name).put(file, uploadsMetadata); //put method upload file to firebase 
+            //update progress bar thod allow us to find out state change
+
+            // someAsynchronousThingLikeCallingAWebApi
+            // .then(nextThingToDoIfItSuceeded)
+            // .then(callSomeOtherApiIfThePreviousSuceeded)
+            // .then(nextThing)
+            // .catch(oops)
+            task
+                .then(function (snapshot) {
+                    var imageUrl = snapshot.a.downloadURLs[0];
+                    $.ajax({
+                        url: "https://southcentralus.api.cognitive.microsoft.com/customvision/v2.0/Prediction/c84c89ea-cb6b-44c2-a381-95a7f6cc80a4/url",
+                        beforeSend: function (xhrObj) {
+                            // Request headers
+                            xhrObj.setRequestHeader("Prediction-key", "");
+                            xhrObj.setRequestHeader("Content-Type", "application/json");
+                            xhrObj.setRequestHeader("Prediction-Key", "6be698b13a364fcfb97fbc3884c9d061");
+                        },
+                        type: "POST",
+                        // Request body
+                        data: JSON.stringify({ "Url": imageUrl })
+                    })
+                        .done(function (data) {
+                            // alert("success" + JSON.stringify(data));
+                            // console.log(data);
+
+                            // Get what you want from `data`
+                            // return it
+
+                            //var myFish = ['angel', 'clown', 'mandarin', 'sturgeon'];
+                            //var med = med.splice(1);
+
+                        })
+                        .then(function (data) {
+                            var med = data.predictions;
+
+                            var medname = med[0];
+                            console.log(medname)
+
+                            //getting the probability and name together
+                            var medID = medname.tagName;
+                            console.log(medID);
+
+                            //  console.log(medname.probability);
+                            var medprob = medname.probability;
+                            console.log(medprob);
+
+
+
+                            if (medID == "Enalapril maleate") {
+                                //testing redirection 
+                                window.location.href = "#pagetwo";
+                                //.replace / .href try both.
+
+
+                                (function (medID) {
+
+
+
+                                    //https://api.fda.gov/drug/label.json?search=%22lisinopril%22&limit=5
+                                    $.getJSON("https://api.fda.gov/drug/label.json?search=%22Enalapril%20maleate%22&limit=5",
+                                        function (obj) {
+
+                                            var x = obj.results[3];
+                                            var indication = x.indications_and_usage;
+                                            var administration_table = x.dosage_and_administration_table;
+                                            var drug_interaction = x.drug_interactions
+
+                                            // document.getElementById("content").innerHTML = indication;
+                                            // document.getElementById("Dosing").innerHTML = administration_table;
+                                            //document.getElementById("ProperUse  ").innerHTML = drug_interaction
+
+                                            //console.log(JSON.stringify(indication));
+                                            //console.log(JSON.stringify(administration_table));
+                                            //console.log(JSON.stringify(drug_interaction));
+
+
+                                        },
+                                    )
+
+                                }());
+
+                            }
+                         /*   else if (medID == "furosemide") // remove furosemide
+                            {
+
+
+                            }*/ else if (medID == "lisinopril") {
+
+
+                                window.location.href = "#pagethree";
+                                //getting information from database api
+                                $.getJSON("https://api.fda.gov/drug/label.json?search=" + medID,
+                                    function (obj) {
+                                        console.log(JSON.stringify(obj));
+
+                                    },
+                                )
+                            }
+                            else if (medID == "Losartan") {
+                                window.location.href = "#pagefour";
+                                (function (medID) {
+                                    $.getJSON("https://api.fda.gov/drug/label.json?search=%22Enalapril%20maleate%22&limit=5",
+                                        function (obj) {
+
+                                            //var x = obj.results[3];
+                                            console.log(JSON.stringify(x));
+                                        },
+                                    )
+
+                                }());
+
+
+                            }
+
+
+
+
+                        })
+
+
+                        .fail(function (error) {
+                            // alert("error" + JSON.stringify(error));
+                        });
+                })
+
+
+            task.on("state_change", //on meploader.value = percentage;
+
+                function progress(snapshot) {
+                    var percentage = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    uploader.value = percentage;
+                },
+                function error(err) { console.log("Upload error", err); },
+                function complete() {
+                    console.log("ok"); var metadata = task.snapshot.metadata;
+
+
+
+
+
+                })
+        });
+
+        // Create a reference to the file whose metadata we want to retrieve var forestRef = storageRef.child('images/forest.jpg'); // Get metadata properties
+       /* forestRef.getMetadata().then(function (metadata) { // Metadata now contains the metadata for 'images/forest.jpg' }).catch(function(error)
+            { // Uh-oh, an error occurred! }); */
+
+    </script>
+
+    <!--<script>
+$.ajax({
+                        url: "http://rximage.nlm.nih.gov/api/rximage/1/rxnav?{parameters}",
+                        
+                        },
+                        type: "POST",
+                        // Request body
+                        data: JSON.stringify({ "Url": imageUrl })
+                    })
+</script>-->
+
+
+
+
+
+    <!-- Start of second page -->
+    <div data-role="page" id="pagetwo">
+
+        <div data-role="header" data-position="fixed">
+
+            <p id="menubar2">
+                <span style="cursor:pointer" onclick="openNav()">&#9776; Menu</span>
+            </p>
+            <p>
+                <a class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all" href="#" data-rel="back" data-role="button" role="button">back</a>
+                <p>
+                    <div id="leftsidenav" class="sidenav">
+                        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+
+                        <a href="index.html">Find another Drug</a>
+                        <!-- javascript indications_and_usage-->
+                        <a href="#pagethree">lisinopril</a>
+                        <a href="#pagefour">Losartan</a>
+
+                    </div>
+        </div>
+
+        <style>
+            #menubar2 {
+                margin-top: 10px;
+                margin-left: 5px;
+            }
+        </style>
+        <script>
+
+
+
+            function openNav() {
+                document.getElementById("leftsidenav").style.width = "250px";
+            }
+
+            function closeNav() {
+                document.getElementById("leftsidenav").style.width = "0";
+            }
+        </script>
+
+
+        <div data-role="content">
+            <!-- /content -->
+            <div id="content">
+                <h2 id="page2overview"> OverView of Enalapril</h2>
+                <p>Enalapril is used alone or together with other medicine to treat high blood pressure (hypertension). High
+                    blood pressure adds to the workload of the heart and arteries. If it continues for a long time, the heart
+                    and arteries may not function properly. This can damage the blood vessels of the brain, heart, and kidney,
+                    resulting in a stroke, heart failure or kidney failure. Lowering blood pressure can reduce the risk of
+                    strokes and heart attack</p>
+
+
+                <div id="enalaprilContent">
+                    <p>Enalapril is an angiotensin converting enzyme (ACE) inhibitor. It works by blocking a substance in the
+                        body that causes the blood vessels to tighten. As a result, enalapril relaxes the blood vessels.
+                        This lowers blood pressure and increases the supply of blood and oxygen to the heart.</p>
+                    <p>Enalapril is also used in combination with other medicines to treat congestive heart failure and cut
+                        down on the number of hospital visit for heart problems.</p>
+
+                </div>
+                <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#enalaprilContent" onclick="change1()">
+                    <span id="seemore1"> See more</span>
+                </button>
+
+                <style>
+                    #enalaprilContent {
+                        display: none;
+                    }
+                </style>
+
+                <script>
+                    var count1 = 1
+                    function change1() {
+
+                        var x = document.getElementById("enalaprilContent")
+                        if (count1 % 2 == 0) {
+                            x.style.display = "none";
+                            document.getElementById("seemore1").innerHTML = "See More";
+                        } else if (count1 % 2 == 1) {
+                            x.style.display = "block";
+
+                            document.getElementById("seemore1").innerHTML = "Hide";
+                        }
+                        count1 = count1 + 1;
+                    }
+
+                </script>
+
+                <br>
+
+
+                <div >
+                    <h2 id="Page2ProperUse"> Proper Use</h2>
+                    <p>In addition to the use of this medicine, treatment for your high blood pressure may include weight control
+                        and changes in the types of foods you eat, especially foods high in sodium (salt). Your doctor will
+                        tell you which of these are most important for you. You should check with your doctor before changing
+                        your diet.
+                    </p>
+
+
+
+                    <div id="enalaprilUse">
+                        <p>Many patients who have high blood pressure will not notice any signs of the problem. In fact, many
+                            may feel normal. It is very important that you take your medicine exactly as directed and that
+                            you keep your appointments with your doctor even if you feel well.</p>
+                        <p>Remember that this medicine will not cure your high blood pressure but it does help control it. Therefore,
+                            you must continue to take it as directed if you expect to lower your blood pressure and keep
+                            it down. You may have to take high blood pressure medicine for the rest of your life. If high
+                            blood pressure is not treated, it can cause serious problems such as heart failure, blood vessel
+                            disease, stroke, or kidney disease.
+                        </p>
+                        <p>Measure the oral liquid with a marked measuring spoon, oral syringe, or medicine cup. The average
+                            household teaspoon may not hold the right amount of liquid.</p>
+                    </div>
+                    <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#enalaprilUse" onclick="change2()">
+                        <span id="seemore2"> See more</span>
+                    </button>
+                </div>
+                <style>
+                    #enalaprilUse {
+                        display: none;
+                    }
+                </style>
+
+                <script>
+                    var count2 = 1
+                    function change2() {
+
+                        var x = document.getElementById("enalaprilUse")
+                        if (count2 % 2 == 0) {
+                            x.style.display = "none";
+                            document.getElementById("seemore2").innerHTML = "See More";
+                        } else if (count2 % 2 == 1) {
+                            x.style.display = "block";
+
+                            document.getElementById("seemore2").innerHTML = "Hide";
+                        }
+                        count2 = count2 + 1;
+                    }
+
+                </script>
+                <br>
+
+                <div>
+                    <h1 id="Page2Dosing">Dosing</h1>
+                    <p>The dose of this medicine will be different for different patients. Follow your doctor's orders or the
+                        directions on the label. The following information includes only the average doses of this medicine.
+                        If your dose is different, do not change it unless your doctor tells you to do so.</p>
+
+
+
+                    <div id="enalaprilDosage">
+                        <p>The amount of medicine that you take depends on the strength of the medicine. Also, the number of
+                            doses you take each day, the time allowed between doses, and the length of time you take the
+                            medicine depend on the medical problem for which you are using the medicine.</p>
+
+                        <ul>
+                            <li>For oral dosage forms (oral solution or tablets):</li>
+                            <ul>
+                                <li>For high blood pressure:</li>
+                                <ul>
+                                    <li>Adults—At first, 5 milligrams (mg) once a day. Your doctor may increase your dose as
+                                        needed. However, the dose is usually not more than 40 mg per day.</li>
+                                    <li>Children 1 month of age and older—Dose is based on body weight and must be determined
+                                        by your doctor. The starting dose is usually 0.08 mg per kilogram (kg) of body weight
+                                        per day. Your doctor may adjust your dose as needed. However, the dose is usually
+                                        not more than 0.58 mg per kg of body weight or 40 mg per day.
+                                    </li>
+                                    <li>Children younger than 1 month of age—Use is not recommended.</li>
+                                </ul>
+                                <li>For heart failure:</li>
+                                <ul>
+                                    <li>Adults—At first, 2.5 milligrams (mg) two times a day. Your doctor may increase your dose
+                                        as needed. However, the dose is usually not more than 40 mg per day.</li>
+                                    <li> Children—Use and dose must be determined by your doctor.</li>
+                                </ul>
+                                <li>For abnormal heart ventricle: </li>
+                                <ul>
+                                    <li>Adults—At first, 2.5 milligrams (mg) two times a day. Your doctor may increase your dose
+                                        as needed. However, the dose is usually not more than 20 mg per day.</li>
+                                    <li>Children—Use and dose must be determined by your doctor.</li>
+                                </ul>
+
+                            </ul>
+                        </ul>
+                    </div>
+                    <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#enalaprilDosage" onclick="change3()">
+                        <span id="seemore3"> See more</span>
+                    </button>
+                    <style>
+                        #enalaprilDosage {
+                            display: none;
+                        }
+                    </style>
+
+                    <script>
+                        var count3 = 1
+                        function change3() {
+
+                            var x = document.getElementById("enalaprilDosage")
+                            if (count3 % 2 == 0) {
+                                x.style.display = "none";
+                                document.getElementById("seemore3").innerHTML = "See More";
+                            } else if (count3 % 2 == 1) {
+                                x.style.display = "block";
+
+                                document.getElementById("seemore3").innerHTML = "Hide";
+                            }
+                            count3 = count3 + 1;
+                        }
+
+                    </script>
+                </div>
+            </div>
+        </div>
+
+
+        <div data-role="footer">
+            <!-- /footer -->
+            <p class="footer">The information on this site is not intended or implied to be a substitute for professional medical advice, diagnosis
+                or treatment. All content, including text, graphics, images and information, contained on or available through
+                this web site is for general information purposes only. </p>
+        </div>
+
+        <style>
+            .footer {
+                font-size: 8px;
+                padding: 5px;
+            }
+        </style>
+
+    </div>
+
+    <style>
+        body {
+            font-family: "Lato", sans-serif;
+        }
+
+        .sidenav {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            background-color: #111;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+        }
+
+        .sidenav a {
+            padding: 8px 8px 8px 32px;
+            text-decoration: none;
+            font-size: 18px;
+            color: #f1f1f1;
+            display: block;
+            transition: 0.3s;
+        }
+
+        .sidenav a:hover {
+            color: #f1f1f1;
+        }
+
+        .sidenav .closebtn {
+            position: absolute;
+            top: 0;
+            right: 25px;
+            font-size: 36px;
+            margin-left: 50px;
+        }
+
+        @media screen and (max-height: 450px) {
+            .sidenav {
+                padding-top: 15px;
+            }
+            .sidenav a {
+                font-size: 18px;
+            }
+        }
+    </style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Start of 3rd page -->
+    <div data-role="page" id="pagethree">
+
+        <div data-role="header" data-position="fixed">
+
+            <p id="menubar3">
+                <span style="cursor:pointer" onclick="openNav3()">&#9776; Menu</span>
+            </p>
+            <p>
+                <a class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all" href="#" data-rel="back" data-role="button" role="button">back</a>
+                <p>
+                    <div id="leftsidenav3" class="sidenav">
+                        <a href="javascript:void(0)" class="closebtn" onclick="closeNav3()">&times;</a>
+
+                        <a href="index.html">Find another Drug</a>
+                        <!-- javascript indications_and_usage-->
+                        <a href="#pagetwo">Enalapril Maleate</a>
+                        <a href="#pagefour">Losartan</a>
+
+                    </div>
+        </div>
+
+        <style>
+            #menubar3 {
+                margin-top: 10px;
+                margin-left: 5px;
+            }
+        </style>
+        <div data-role="content">
+            <div id="content">
+                <h3 id="page3overview"> OverView of Lisinopril</h3>
+                <p class="forpadding">Lisinopril is used alone or together with other medicines to treat high blood pressure (hypertension). High
+                    blood pressure adds to the workload of the heart and arteries. If it continues for a long time, the heart
+                    and arteries may not function properly. This can damage the blood vessels of the brain, heart, and kidneys
+                    resulting in a stroke, heart failure, or kidney failure. Lowering blood pressure can reduce the risk
+                    of strokes and heart attacks. </p>
+
+
+
+                <div id="lisinoprilContent">
+                    <p class="forpadding">Lisinopril works by blocking a substance in the body that causes the blood vessels to tighten. As a result,
+                        lisinopril relaxes the blood vessels. This lowers blood pressure and increases the supply of blood
+                        and oxygen to the heart.
+                    </p>
+                    <p class="forpadding">Lisinopril is also used to help treat heart failure. It is also used in some patients after a heart attack.
+                        After a heart attack, some of the heart muscle is damaged and weakened. The heart muscle may continue
+                        to weaken as time goes by. This makes it more difficult for the heart to pump blood. Lisinopril may
+                        be started within 24 hours after a heart attack to increase survival rate.</p>
+                    <p> This medicine is available only with your doctor's prescription. </p>
+                </div>
+                <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#lisinoprilContent" onclick="changeL1()">
+                    <span id="seemoreL1"> See more</span>
+                </button>
+            </div>
+
+            <style>
+                #lisinoprilContent {
+                    display: none;
+                }
+            </style>
+
+            <script>
+                var countl1 = 1
+                function changeL1() {
+
+                    var x = document.getElementById("lisinoprilContent")
+                    if (countl1 % 2 == 0) {
+                        x.style.display = "none";
+                        document.getElementById("seemoreL1").innerHTML = "See More";
+                    } else if (countl1 % 2 == 1) {
+                        x.style.display = "block";
+
+                        document.getElementById("seemoreL1").innerHTML = "Hide";
+                    }
+                    countl1 = countl1 + 1;
+                }
+
+            </script>
+
+            <br>
+
+            <div id="Page3ProperUse">
+                <h2 class="CSSProperUse"> Proper Use</h2>
+                <p class="forpadding">In addition to the use of this medicine, treatment for your high blood pressure may include weight control
+                    and changes in the types of foods you eat, especially foods high in sodium (salt). Your doctor will tell
+                    you which of these are most important for you. You should check with your doctor before changing your
+                    diet. </p>
+
+                <div id="lisinoprilUse">
+                    <p class="forpadding">Many patients who have high blood pressure will not notice any signs of the problem. In fact, many may
+                        feel normal. It is very important that you take your medicine exactly as directed and that you keep
+                        your appointments with your doctor even if you feel well. </p>
+                    <p class="forpadding">Remember that this medicine will not cure your high blood pressure but it does help control it. Therefore,
+                        you must continue to take it as directed if you expect to lower your blood pressure and keep it down.
+                        You may have to take high blood pressure medicine for the rest of your life. If high blood pressure
+                        is not treated, it can cause serious problems such as heart failure, blood vessel disease, stroke,
+                        or kidney disease. </p>
+                    <p class="forpadding"> Measure the oral liquid correctly using the marked measuring spoon that comes with the package. Rinse
+                        the dosing spoon with water after each use. </p>
+                    <p class="class=" forpadding "">If your child cannot swallow the tablets, an oral liquid may be given. Shake the oral liquid well just
+                        before each use. Ask your doctor or pharmacist about this.</p>
+                </div>
+                <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#lisinoprilUse" onclick="changeL2()">
+                    <span id="seemoreL2"> See more</span>
+                </button>
+
+                <style>
+                    #lisinoprilUse {
+                        display: none;
+                    }
+                </style>
+
+                <script>
+                    var countL2 = 1
+                    function changeL2() {
+
+                        var x = document.getElementById("lisinoprilUse")
+                        if (countL2 % 2 == 0) {
+                            x.style.display = "none";
+                            document.getElementById("seemoreL2").innerHTML = "See More";
+                        } else if (count2 % 2 == 1) {
+                            x.style.display = "block";
+
+                            document.getElementById("seemoreL2").innerHTML = "Hide";
+                        }
+                        countL2 = countL2 + 1;
+                    }
+
+                </script>
+
+            </div>
+
+            <div id="Dosing">
+                <h2 id="Page3Dosing">Dosing</h2>
+                <p class="class=" forpadding "">The dose of this medicine will be different for different patients. Follow your doctor's orders or the directions
+                    on the label. The following information includes only the average doses of this medicine. If your dose
+                    is different, do not change it unless your doctor tells you to do so.</p>
+
+
+                <div id="LisinoprilDosage">
+                    <p class="forpadding">The amount of medicine that you take depends on the strength of the medicine. Also, the number of doses
+                        you take each day, the time allowed between doses, and the length of time you take the medicine depend
+                        on the medical problem for which you are using the medicine.</p>
+
+                    <ul>
+                        <li>For oral dosage forms (oral solution or tablets):</li>
+                        <ul>
+                            <li>For high blood pressure:</li>
+                            <ul>
+                                <li>Adults—At first, 10 milligrams (mg) once a day. Your doctor may increase your dose as needed.
+                                    However, the dose is usually not more than 40 mg per day.</li>
+                                <li>Children 6 years of age and older—Dose is based on body weight and must be determined by
+                                    your doctor. The starting dose is usually 0.07 mg per kilogram (kg) of body weight per
+                                    day. Your doctor may adjust your dose as needed. However, the dose is usually not more
+                                    than 0.61 mg per kg of body weight or 40 mg per day.</li>
+                                <li>Children younger than 6 years of age—Use is not recommended. </li>
+                            </ul>
+                            <li>For heart failure:</li>
+                            <ul>
+                                <li>Adults—At first, 5 milligrams (mg) once a day. Your doctor may increase your dose as needed.
+                                    However, the dose is usually not more than 40 mg per day.</li>
+                                <li> Children—Use and dose must be determined by your doctor.</li>
+                            </ul>
+                            <li>For immediate treatment after a heart attack:</li>
+                            <ul>
+                                <li>Adults—At first, 5 milligrams (mg), followed by 5 mg after 24 hours, followed by 10 mg after
+                                    48 hours, and then 10 mg once a day.</li>
+                                <li>Children—Use and dose must be determined by your doctor. </li>
+                            </ul>
+
+                        </ul>
+                    </ul>
+                </div>
+                <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#LisinoprilDosage" onclick="changeL3()">
+                    <span id="seemoreL3"> See more</span>
+                </button>
+                <style>
+                    #LisinoprilDosage {
+                        display: none;
+                    }
+                </style>
+
+                <script>
+                    var countL3 = 1
+                    function changeL3() {
+
+                        var x = document.getElementById("LisinoprilDosage")
+                        if (countL3 % 2 == 0) {
+                            x.style.display = "none";
+                            document.getElementById("seemoreL3").innerHTML = "See More";
+                        } else if (countL3 % 2 == 1) {
+                            x.style.display = "block";
+
+                            document.getElementById("seemoreL3").innerHTML = "Hide";
+                        }
+                        countL3 = countL3 + 1;
+                    }
+
+                </script>
+            </div>
+        </div>
+
+
+
+        <div data-role="footer">
+            <!-- /footer -->
+            <p class="footer">The information on this site is not intended or implied to be a substitute for professional medical advice, diagnosis
+                or treatment. All content, including text, graphics, images and information, contained on or available through
+                this web site is for general information purposes only. </p>
+        </div>
+
+    </div>
+    <!-- End of page3 -->
+
+    <script>
+
+        function openNav3() {
+            document.getElementById("leftsidenav3").style.width = "250px";
+        }
+
+        function closeNav3() {
+            document.getElementById("leftsidenav3").style.width = "0";
+        }</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Start of 4rd page -->
+    <div data-role="page" id="pagefour">
+
+        <div data-role="header" data-position="fixed">
+
+            <p id="menubar4">
+                <span style="cursor:pointer" onclick="openNav4()">&#9776; Menu</span>
+            </p>
+            <p>
+                <a class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all" href="#" data-rel="back" data-role="button" role="button">back</a>
+                <p>
+                    <div id="leftsidenav4" class="sidenav">
+                        <a href="javascript:void(0)" class="closebtn" onclick="closeNav4()">&times;</a>
+
+                        <a href="index.html">Find another Drug</a>
+                        <!-- javascript indications_and_usage-->
+                        <a href="#pagetwo">Enalapril Maleate</a>
+                        <a href="#pagethree">Lisinopril</a>
+
+
+                    </div>
+        </div>
+        <style>
+            #menubar4 {
+                margin-top: 10px;
+                margin-left: 5px;
+            }
+        </style>
+
+        <div data-role="content">
+            <div id="content">
+                <h2> OverView of Losartan</h2>
+                <p>In addition to the use of the medicine your doctor has prescribed, treatment for your high blood pressure
+                    may include weight control and changes in the types of foods you eat, especially foods high in sodium
+                    (salt). Your doctor will tell you which of these are most important for you. You should check with your
+                    doctor before changing your diet. </p>
+
+
+
+
+                <div id="losartanContent">
+                    <p>Many patients who have high blood pressure will not notice any signs of the problem. In fact, many may
+                        feel normal. It is very important that you take your medicine exactly as directed and that you keep
+                        your appointments with your doctor even if you feel well.
+                    </p>
+                    <p>Remember that this medicine will not cure your high blood pressure but it does help control it. You must
+                        continue to take it as directed if you expect to lower your blood pressure and keep it down. You
+                        may have to take high blood pressure medicine for the rest of your life. If high blood pressure is
+                        not treated, it can cause serious problems such as heart failure, blood vessel disease, stroke, or
+                        kidney disease.
+                    </p>
+                    <p> This medicine may be taken with or without food. </p>
+                    <p>If you are unable to swallow tablets, ask your pharmacist about preparing an oral suspension for you.
+                    </p>
+                    <p>This medicine comes with a patient information insert. Read and follow the instructions carefully. Ask
+                        your doctor if you have any questions. </p>
+                </div>
+                <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#losartanContent" onclick="changeLo1()">
+                    <span id="seemoreLo1"> See more</span>
+                </button>
+            </div>
+
+            <style>
+                #losartanContent {
+                    display: none;
+                }
+            </style>
+
+            <script>
+                var countlo1 = 1
+                function changeLo1() {
+
+                    var x = document.getElementById("losartanContent")
+                    if (countlo1 % 2 == 0) {
+                        x.style.display = "none";
+                        document.getElementById("seemoreLo1").innerHTML = "See More";
+                    } else if (countlo1 % 2 == 1) {
+                        x.style.display = "block";
+
+                        document.getElementById("seemoreLo1").innerHTML = "Hide";
+                    }
+                    countlo1 = countlo1 + 1;
+                }
+
+            </script>
+
+            <br>
+
+            <div id="losartanProperUse">
+                <h2 class="CSSProperUse"> Proper Use</h2>
+                <p>In addition to the use of this medicine, treatment for your high blood pressure may include weight control
+                    and changes in the types of foods you eat, especially foods high in sodium (salt). Your doctor will tell
+                    you which of these are most important for you. You should check with your doctor before changing your
+                    diet. </p>
+
+
+                <div id="losartanUse">
+                    <p>Many patients who have high blood pressure will not notice any signs of the problem. In fact, many may
+                        feel normal. It is very important that you take your medicine exactly as directed and that you keep
+                        your appointments with your doctor even if you feel well. </p>
+                    <p>Remember that this medicine will not cure your high blood pressure but it does help control it. Therefore,
+                        you must continue to take it as directed if you expect to lower your blood pressure and keep it down.
+                        You may have to take high blood pressure medicine for the rest of your life. If high blood pressure
+                        is not treated, it can cause serious problems such as heart failure, blood vessel disease, stroke,
+                        or kidney disease. </p>
+                    <p>Measure the oral liquid correctly using the marked measuring spoon that comes with the package. Rinse
+                        the dosing spoon with water after each use. </p>
+                    <p>If your child cannot swallow the tablets, an oral liquid may be given. Shake the oral liquid well just
+                        before each use. Ask your doctor or pharmacist about this.</p>
+                </div>
+                <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#losartanUse" onclick="changeLo2()">
+                    <span id="seemoreLo2"> See more</span>
+                </button>
+                <style>
+                    #losartanUse {
+                        display: none;
+                    }
+                </style>
+
+                <script>
+                    var countLo2 = 1
+                    function changeLo2() {
+
+                        var x = document.getElementById("losartanUse")
+                        if (countLo2 % 2 == 0) {
+                            x.style.display = "none";
+                            document.getElementById("seemoreLo2").innerHTML = "See More";
+                        } else if (count2 % 2 == 1) {
+                            x.style.display = "block";
+
+                            document.getElementById("seemoreLo2").innerHTML = "Hide";
+                        }
+                        countLo2 = countLo2 + 1;
+                    }
+
+                </script>
+
+            </div>
+
+            <div id="Dosing">
+                <h2>Dosing</h2>
+                <p>The dose of this medicine will be different for different patients. Follow your doctor's orders or the directions
+                    on the label. The following information includes only the average doses of this medicine. If your dose
+                    is different, do not change it unless your doctor tells you to do so.</p>
+
+
+                <div id="losartanDosage">
+                    <p>The dose of this medicine will be different for different patients. Follow your doctor's orders or the
+                        directions on the label. The following information includes only the average doses of this medicine.
+                        If your dose is different, do not change it unless your doctor tells you to do so.</p>
+                    <p>The amount of medicine that you take depends on the strength of the medicine. Also, the number of doses
+                        you take each day, the time allowed between doses, and the length of time you take the medicine depend
+                        on the medical problem for which you are using the medicine.</p>
+                    <ul>
+                        <li>For oral dosage form (tablets): </li>
+                        <ul>
+                            <li>For high blood pressure:</li>
+                            <ul>
+                                <li>Adults—At first, 50 milligrams (mg) once a day. Your doctor may adjust your dose as needed.</li>
+                                <li>Children 6 to 16 years of age—Dose is based on body weight and must be determined by your
+                                    doctor. The starting dose is usually 0.7 milligram (mg) per kilogram (kg) of body weight
+                                    per day. Your doctor may adjust your dose as needed. However, the dose is usually not
+                                    more than 50 mg per day.</li>
+                                <li>Children younger than 6 years of age—Use and dose must be determined by your doctor. </li>
+                            </ul>
+                            <li>For lowering risk of stroke in patients with high blood pressure and enlargement of the heart:</li>
+                            <ul>
+                                <li>Adults—At first, 50 milligrams (mg) once a day. Your doctor may adjust your dose and add
+                                    another medicine based on your blood pressure response.</li>
+                                <li>Children—Use and dose must be determined by your doctor. </li>
+                            </ul>
+                            <li>For diabetic nephropathy:</li>
+                            <ul>
+                                <li>Adults—At first, 50 milligrams (mg) once a day. Your doctor may adjust your dose based on
+                                    your blood pressure response.</li>
+                                <li>Children—Use and dose must be determined by your doctor. </li>
+                            </ul>
+
+                        </ul>
+                    </ul>
+                </div>
+                <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#losartanDosage" onclick="changeLo3()">
+                    <span id="seemoreLo3"> See more</span>
+                </button>
+                <style>
+                    #losartanDosage {
+                        display: none;
+                    }
+                </style>
+
+                <script>
+                    var countLo3 = 1
+                    function changeLo3() {
+
+                        var x = document.getElementById("losartanDosage")
+                        if (countLo3 % 2 == 0) {
+                            x.style.display = "none";
+                            document.getElementById("seemoreLo3").innerHTML = "See More";
+                        } else if (countLo3 % 2 == 1) {
+                            x.style.display = "block";
+
+                            document.getElementById("seemoreLo3").innerHTML = "Hide";
+                        }
+                        countLo3 = countLo3 + 1;
+                    }
+
+                </script>
+            </div>
+        </div>
+        <div data-role="footer">
+            <!-- /footer -->
+            <p class="footer">The information on this site is not intended or implied to be a substitute for professional medical advice, diagnosis
+                or treatment. All content, including text, graphics, images and information, contained on or available through
+                this web site is for general information purposes only. </p>
+        </div>
+    </div>
+
+    <!-- End of page3 -->
+
+    <script>
+
+        function openNav4() {
+            document.getElementById("leftsidenav4").style.width = "250px";
+        }
+
+        function closeNav4() {
+            document.getElementById("leftsidenav4").style.width = "0";
+        }</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+
+</html>
