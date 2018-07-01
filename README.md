@@ -1,2 +1,1 @@
-# SplashAwardStageB
-MedRemind
+MAD2
