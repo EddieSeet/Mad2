@@ -4,50 +4,78 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta charset="utf-8" />
     <style media="screen"></style>
-    <link rel="stylesheet" href="style.css" />
+    <!--<link rel="stylesheet" href="style.css" />-->
+
+    <script src="respond.min.js"> </script>
+    <modernizr class="custom 62074 js"></modernizr>
+
+    <!-- jquery-->
     <link rel="stylesheet" href="jquery.mobile-1.4.5.min.css" />
     <script src="jquery-1.11.3.min.js"></script>
     <script src="jquery.mobile-1.4.5.js"></script>
-    <script src="respond.min.js"> </script>
-    <modernizr class="custom 62074 js"></modernizr>
     <script src="jquery-3.3.1.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <!--bootstrap-->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
         crossorigin="anonymous"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <!--bootstrap-->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+
+    <!--style from firebase for ui
+    <script src="https://cdn.firebase.com/libs/firebaseui/2.5.1/firebaseui.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/2.5.1/firebaseui.css" />
+-->
+
+    <!-- fire base core-->
+    <script src="https://www.gstatic.com/firebasejs/5.1.0/firebase-app.js"></script>
+
+    <!-- Add additional services that you want to use -->
+
+    <!-- authentication -->
+    <script src="https://www.gstatic.com/firebasejs/5.1.0/firebase-auth.js"></script>
+    <!-- real time database-->
+    <script src="https://www.gstatic.com/firebasejs/5.1.0/firebase-database.js"></script>
+    <!-- cloud firestore-->
+    <script src="https://www.gstatic.com/firebasejs/5.1.0/firebase-firestore.js"></script>
+    <!-- firecloud cloud messaging-->
+    <script src="https://www.gstatic.com/firebasejs/5.1.0/firebase-messaging.js"></script>
+    <!-- clo-->
+    <script src="https://www.gstatic.com/firebasejs/5.1.0/firebase-functions.js"></script>
+
 </head>
-<!-- fire base-->
-<script src="https://www.gstatic.com/firebasejs/3.5.2/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/3.5.2/firebase-storage.js"></script>
-<!--<script src="https://www.gstatic.com/firebasejs/3.5.2/firebase-database.js"></script>
-<script src="https://www.gstatic.com/firebasejs/5.0.4/firebase.js"></script>>-->
 
 <body>
 
     <!--page one. Login page-->
-    <div data-role="page" id="pageone">
 
-        <div data-role="header" data-position="fixed"></div>
+    <div data-role="page" id="pageone">
+        <div data-role="header">
+            <h1>My Header</h1>
+        </div>
 
         <div data-role="main" class="ui-content">
-            <div class="container">
-                <h2>Login</h2>
+               
                 <div class="form-group">
-                    <label for="email">Email:</label>
-                    <input type="email" class="form-control" id="email" placeholder="Enter email" required/>
+                        <label for="email">Email:</label>
+                        <input type="email" class="form-control" id="usr" placeholder="Enter email" required/>
+                    </div>
+                    <div class="form-group">
+                        <label for="pwd">Password:</label>
+                        <input type="password" class="form-control" id="pass" placeholder="Enter password" required/>
+                    </div>
+                    <button class="btn btn-default" id="register">Register</button>
+                    <button class="btn btn-default" id="login">Login</button>
+                   <!-- <button class="btn btn-default" id='check'> check user</button> 
+                    <button class="btn btn-default" id='verify'>Send verification</button>-->
                 </div>
-                <div class="form-group">
-                    <label for="pwd">Password:</label>
-                    <input type="password" class="form-control" id="pwd" placeholder="Enter password" required pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
-                        required/>
-                </div>
-                <button type="submit" class="btn btn-default" onclick="newfunction()">Submit</button>
-            </div>
-        </div>
+
+                    </div>
+    
     </div>
+
+
 
 
     <!--pagetwo Finding medicine page-->
@@ -58,14 +86,16 @@
                 <span style="cursor:pointer" onclick="openNav2()">&#9776; Menu</span>
             </p>
             <p>
-                <a class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all" href="#" data-rel="back" data-role="button" role="button">back</a>
+                    <a class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all" id="signout" data-role="button" role="button">Sign out</a>
+
                 <p>
                     <div id="leftsidenav2" class="sidenav">
                         <a href="javascript:void(0)" class="closebtn" onclick="closeNav2()">&times;</a>
-                        <a  href="#pagethree">Enalapril Maleate</a>
+                        <a href="#pagethree">Enalapril Maleate</a>
                         <a href="#pagefour">Lisinopril</a>
                         <a href="#pagefive">Losartan</a>
                         <a href="#pagesix">Map</a>
+                        <input type='button' id='signout' value='Sign Out' />
                     </div>
         </div>
 
@@ -102,14 +132,15 @@ $.ajax({
                 <span style="cursor:pointer" onclick="openNav3()">&#9776; Menu</span>
             </p>
             <p>
-                <a class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all" href="#" data-rel="back" data-role="button" role="button">back</a>
+                    <a class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all" id="signout" data-role="button" role="button">Sign out</a>
+
                 <p>
                     <div id="leftsidenav3" class="sidenav">
                         <a href="javascript:void(0)" class="closebtn" onclick="closeNav3()">&times;</a>
                         <a href="#pagetwo">Check Drug</a>
                         <a href="#pagefour">lisinopril</a>
                         <a href="#pagefive">Losartan</a>
-                        <a href = "#pagesix">Map</a>
+                        <a href="#pagesix">Map</a>
                     </div>
         </div>
 
@@ -251,8 +282,7 @@ $.ajax({
             <p id="menubar4">
                 <span style="cursor:pointer" onclick="openNav4()">&#9776; Menu</span>
             </p>
-            <p>
-                <a class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all" href="#" data-rel="back" data-role="button" role="button">back</a>
+            <p>                    <a class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all" id="signout" data-role="button" role="button">Sign out</a>
                 <p>
                     <div id="leftsidenav4" class="sidenav">
                         <a href="javascript:void(0)" class="closebtn" onclick="closeNav4()">&times;</a>
@@ -397,13 +427,12 @@ $.ajax({
                 <span style="cursor:pointer" onclick="openNav5()">&#9776; Menu</span>
             </p>
             <p>
-                <a class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all" href="#" data-rel="back" data-role="button" role="button">back</a>
+                    <a class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all" id="signout" data-role="button" role="button">Sign out</a>
                 <p>
                     <div id="leftsidenav5" class="sidenav">
                         <a href="javascript:void(0)" class="closebtn" onclick="closeNav5()">&times;</a>
 
-                        <a href="#pagetwo">Find another Drug</a
-                        <a href="#pagethree">Enalapril Maleate</a>
+                        <a href="#pagetwo">Find another Drug</a <a href="#pagethree">Enalapril Maleate</a>
                         <a href="#pagefour">Lisinopril</a>
                         <a href="#pagesix">Map</a>
 
@@ -546,12 +575,13 @@ $.ajax({
                 <span style="cursor:pointer" onclick="openNav6()">&#9776; Menu</span>
             </p>
             <p>
-                <a class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all" href="#" data-rel="back" data-role="button" role="button">back</a>
+                    <a class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all" id="signout" data-role="button" role="button">Sign out</a>
+
                 <p>
                     <div id="leftsidenav6" class="sidenav">
                         <a href="javascript:void(0)" class="closebtn" onclick="closeNav6()">&times;</a>
                         <a href="#pagetwo">Find another Drug</a>
-                        <a  href="#pagethree">Enalapril Maleate</a>
+                        <a href="#pagethree">Enalapril Maleate</a>
                         <a href="#pagefour">lisinopril</a>
                         <a href="#pagefive">Losartan</a>
 
@@ -587,6 +617,15 @@ $.ajax({
 
 
         </div>
+
+
+
+
+
+
+
+
+
 
 
 
@@ -895,20 +934,152 @@ $.ajax({
         <!--All the script-->
         <script>
             //  if (/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[A-Za-z\d!@#$%^&*()_+=]{8,}$/.test(x) == true && /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(y) == true) {
-            function newfunction() {
-                var x = document.getElementById("pwd").value
-                var y = document.getElementById("email").value
+            /*   function newfunction() {
+                   var x = document.getElementById("pwd").value
+                   var y = document.getElementById("email").value
+   
+                   if (/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[A-Za-z\d!@#$%^&*()_+=]{8,}$/.test(x) == true && /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(y) == true) {
+                       window.location.href = "#pagetwo";
+                   }
+                   else {
+                       alert("Check your email and Password")
+                   }
+               }*/
 
-                if (/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[A-Za-z\d!@#$%^&*()_+=]{8,}$/.test(x) == true && /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(y) == true) {
-                    window.location.href = "#pagetwo";
-                }
-                else {
-                    alert("Check your email and Password")
-                }
-            }
+
+            // Initialize Firebase1
+            var config = {
+                apiKey: "AIzaSyAxFQzndiM1bZaQXTD_A-i3fH8YH68uAj4",
+                authDomain: "medproject-9b4df.firebaseapp.com",
+                databaseURL: "https://medproject-9b4df.firebaseio.com",
+                //projectId: "medproject-9b4df",
+                storageBucket: "medproject-9b4df.appspot.com"
+                //messagingSenderId: "270721368507"
+            };
+            firebase.initializeApp(config);
 
 
-            // get elements
+            //testing
+
+            //on page created
+
+                console.log('test');
+
+
+                //for signing up
+                $('#register').on('click', function () {
+                    console.log("clicked")
+                    var usr = $('#usr').val();
+                    var pass = $('#pass').val();
+                    alert(usr + ' ' + pass);
+                    firebase.auth().createUserWithEmailAndPassword(usr, pass).catch(function (error) {
+                        // Handle Errors here.
+                        var errorCode = error.code;
+                        var errorMessage = error.message;
+                        console.log('error signing up ' + error.message);
+                        // ...
+                    });
+
+                });
+
+                //sign  in
+                $('#login').on('click', function () {
+                    var usr = $('#usr').val();
+                    var pass = $('#pass').val();
+                    //console.log(typeof(pas));
+                    //var pass = String(pas);
+                    //alert(usr + ' ' + pass);
+                    firebase.auth().signInWithEmailAndPassword(usr, pass).catch(function (error) {
+                        // Handle Errors here.
+                        var errorCode = error.code;
+                        var errorMessage = error.message;
+                        console.log('error loging in ' + error.message);
+                        // ...
+                    });
+                });
+
+                 $("#signout").on("click",function(){
+                firebase.auth().signOut().then(function() {
+                console.log('Signed Out');
+                }, function(error) {
+                console.error('Sign Out Error', error);
+                });
+                })
+
+                $('#verify').on('click', function () {
+
+                    var user = firebase.auth().currentUser;
+                    console.log(user.emailVerified);
+                    user.sendEmailVerification().then(function () {
+                        console.log('verification email sent');
+                    }, function (error) {
+                        console.log('verification error ' + error.message);
+                    });
+
+                });
+
+
+
+            
+
+                firebase.auth().onAuthStateChanged(function (user) {
+                    if (user) {
+                      window.location.href = "#pagetwo";
+                        console.log('user is signed in');
+                        var user = firebase.auth().currentUser;
+                        //var name, email, uid;
+                  
+                        if (user != null) {
+                             // window.location.href = "#pageone";
+                            name = user.displayName;
+                            email = user.email;
+                            photoUrl = user.photoURL;
+                            uid = user.uid;
+                          
+                            // The user's ID, unique to the Firebase project. Do NOT use
+                            // this value to authenticate with your backend server, if
+                            // you have one. Use User.getToken() instead.
+                            console.log(name + ' ' + email + ' ' + photoUrl + ' ' + uid);
+                        }
+                    } else {
+                        
+                         window.location.href = "#pageone";
+                        console.log('no user is signed in');
+                    }
+                });
+
+   
+
+
+            //end of auth
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            // get elements. //for cognitive service
             var uploader = document.getElementById("uploader");
             var fileButton = document.getElementById("fileButton");
             var uploadsMetadata = { cacheControl: "max-age=" + (60 * 60 * 24 * 365) };
@@ -1062,25 +1233,6 @@ $.ajax({
             /* forestRef.getMetadata().then(function (metadata) { // Metadata now contains the metadata for 'images/forest.jpg' }).catch(function(error)
                  { // Uh-oh, an error occurred! }); */
 
-
-
-
-
-            // Initialize Firebase
-            var config = {
-                apiKey: "AIzaSyAxFQzndiM1bZaQXTD_A-i3fH8YH68uAj4",
-                authDomain: "medproject-9b4df.firebaseapp.com",
-                databaseURL: "https://medproject-9b4df.firebaseio.com",
-                //projectId: "medproject-9b4df",
-                storageBucket: "medproject-9b4df.appspot.com"
-                //messagingSenderId: "270721368507"
-            };
-            firebase.initializeApp(config);
-
-
-
-
-
             //nav starts at page two. Page one is login.
             function openNav2() {
                 document.getElementById("leftsidenav2").style.width = "250px";
@@ -1120,15 +1272,15 @@ $.ajax({
 
 
 
-/* pagetwo is the checker
-pagetwo is Check                <a href="#pagetwo">Check Drug</a>
-pagethree is Enalapril Maleate  <a  href="#pagethree">Enalapril Maleate</a>
-pagefour is lisinopril          <a href="#pagefour">Lisinopril</a>
-pagefive is Losartan            <a href="#pagefive">Losartan</a>
-pagesix is googlemap            <a href="#pagesix">Map</a>
-
-                    
-*/
+            /* pagetwo is the checker
+            pagetwo is Check                <a href="#pagetwo">Check Drug</a>
+            pagethree is Enalapril Maleate  <a  href="#pagethree">Enalapril Maleate</a>
+            pagefour is lisinopril          <a href="#pagefour">Lisinopril</a>
+            pagefive is Losartan            <a href="#pagefive">Losartan</a>
+            pagesix is googlemap            <a href="#pagesix">Map</a>
+            
+                                
+            */
 
 
             //Expandable toggle L1, L2 L3 Lisinopril
@@ -1286,170 +1438,20 @@ pagesix is googlemap            <a href="#pagesix">Map</a>
 
 
         <script>       
-            //testing
-
-
-
-
-
-
-
-
-
-
-            //testing above
-
-
-
-
-            // This example adds a search box to a map, using the Google Place Autocomplete
-            // feature. People can enter geographical searches. The search box will return a
-            // pick list containing a mix of places and predicted search terms.
-
-            // This example requires the Places library. Include the libraries=places
-            // parameter when you first load the API. For example:
-
-
-
-
-
-            //working 
-            // <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places">
-
-            /*function initAutocomplete() {
-      
-                var map = new google.maps.Map(document.getElementById('map'), {
-                    center: { lat: 1.290270, lng: 103.851959 },
-                    zoom: 10,
-                    mapTypeId: 'roadmap'
-                });
-
-
-
-            var request = {
-                location: Singapore,
-                    radius: "500",
-                    fields: ['photos', 'formatted_address', 'name', 'rating', 'opening_hours', 'geometry'],
-                }
-
-                service = new google.maps.places.PlacesService(map);
-                service.findPlaceFromQuery(request, callback)
-
-                function callback(results, status) {
-                    if (status == google.maps.places.PlacesServiceStatus.OK) {
-                        for (var i = 0; i < results.length; i++) {
-                            var place = results[i];
-                            console.warn(place)
-                        }
-                    }
-                }
-
-
-
-
-/*
-//This is where it is called. Request and callback
-                          var map = new google.maps.Map(document.getElementById('map'), {
-                    center: { lat: 1.290270, lng: 103.851959 },
-                    zoom: 10,
-                    mapTypeId: 'roadmap'
-                });
-                
-                var request = {
-                    query: 'Museum of Contemporary Art Australia',
-                    fields: ['photos', 'formatted_address', 'name', 'rating', 'opening_hours', 'geometry'],
-                }
-
-                service = new google.maps.places.PlacesService(map);
-                service.findPlaceFromQuery(request, callback)
-
-                function callback(results, status) {
-                    if (status == google.maps.places.PlacesServiceStatus.OK) {
-                        for (var i = 0; i < results.length; i++) {
-                            var place = results[i];
-                            console.warn(place)
-                        }
-                    }
-                }*/
-
-
-
-            /*       // Create the search box and link it to the UI element.
-                   var input = document.getElementById('pac-input');
-                   var searchBox = new google.maps.places.SearchBox(input);
-                   map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
-   
-   
-                   // Bias the SearchBox results towards current map's viewport.
-                   map.addListener('bounds_changed', function () {
-                       searchBox.setBounds(map.getBounds());
-                   });
-   
-   
-   
-   
-   
-                   var markers = [];
-                   // Listen for the event fired when the user selects a prediction and retrieve
-                   // more details for that place.
-                   searchBox.addListener('places_changed', function () {
-                       var places = searchBox.getPlaces();
-   
-                       if (places.length == 0) {
-                           return;
-                       }
-   
-                       // Clear out the old markers.
-                       markers.forEach(function (marker) {
-                           marker.setMap(null);
-                       });
-                       markers = [];
-   
-                       // For each place, get the icon, name and location.
-                       var bounds = new google.maps.LatLngBounds();
-                       places.forEach(function (place) {
-                           if (!place.geometry) {
-                               console.log("Returned place contains no geometry");
-                               return;
-                           }
-                           var icon = {
-                               url: place.icon,
-                               size: new google.maps.Size(71, 71),
-                               origin: new google.maps.Point(0, 0),
-                               anchor: new google.maps.Point(17, 34),
-                               scaledSize: new google.maps.Size(25, 25)
-                           };
-   
-                           // Create a marker for each place.
-                           markers.push(new google.maps.Marker({
-                               map: map,
-                               icon: icon,
-                               title: place.name,
-                               position: place.geometry.location
-                           }));
-   
-                           if (place.geometry.viewport) {
-                               // Only geocodes have viewport.
-                               bounds.union(place.geometry.viewport);
-                           } else {
-                               bounds.extend(place.geometry.location);
-                           }
-                       });
-                       map.fitBounds(bounds);
-                   });
-   
-   
-   
-               }
-   */
-
-
-
+            //google map
+            var mapsrc = "https://raw.githubusercontent.com/EddieSeet/Mad2/master/retail-pharmacy-locations-kml.kml"
             function initMap() {
                 var map = new google.maps.Map(document.getElementById('map'), {
                     mapTypeControl: false,
                     center: { lat: 1.3521, lng: 103.8198 },
                     zoom: 13
+                });
+
+                //blue markers
+                var kmlLayer = new google.maps.KmlLayer(mapsrc, {
+                    suppressInfoWindows: false,
+                    preserveViewport: false,
+                    map: map
                 });
 
                 new AutocompleteDirectionsHandler(map);
@@ -1570,6 +1572,8 @@ pagesix is googlemap            <a href="#pagesix">Map</a>
                     }
                 });
             };
+
+            //end of googlemap
         </script>
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyARfypFscgY3h8nS-tRX6E0D0KR0iqVNno&libraries=places&callback=initMap"
             async defer></script>
